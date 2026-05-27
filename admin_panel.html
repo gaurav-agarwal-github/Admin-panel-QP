@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel – Quality Pharmaceuticals</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --teal: #0f9488;
+  --teal-dark: #0a7268;
+  --teal-light: #e6f7f6;
+  --navy: #1a2b4a;
+  --danger: #e53e3e;
+  --danger-light: #fff5f5;
+  --warning: #d69e2e;
+  --success: #38a169;
+  --success-light: #f0fff4;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #2d3748;
+  --muted: #718096;
+  --sidebar-w: 260px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ─── LOGIN ─── */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--teal-dark) 100%);
+}
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  text-align: center;
+}
+.login-logo {
+  font-size: 2rem;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+.login-card h1 { font-size: 1.5rem; color: var(--navy); margin-bottom: 4px; }
+.login-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 32px; }
+.login-field { position: relative; margin-bottom: 16px; text-align: left; }
+.login-field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+.login-field input {
+  width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-family: inherit; font-size: 0.95rem;
+  transition: border-color .2s;
+}
+.login-field input:focus { outline: none; border-color: var(--teal); }
+.login-btn {
+  width: 100%; padding: 13px; background: var(--teal); color: white;
+  border: none; border-radius: 10px; font-family: inherit; font-size: 1rem;
+  font-weight: 600; cursor: pointer; margin-top: 8px; transition: background .2s;
+}
+.login-btn:hover { background: var(--teal-dark); }
+.login-error { color: var(--danger); font-size: 0.85rem; margin-top: 10px; display: none; }
+
+/* ─── APP SHELL ─── */
+#app { display: none; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: transform .3s;
+}
+.sidebar-brand {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-brand .brand-name { color: white; font-weight: 700; font-size: 1rem; line-height: 1.3; }
+.sidebar-brand .brand-sub { color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  color: rgba(255,255,255,0.6); font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; transition: all .2s; margin-bottom: 4px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: white; }
+.nav-item.active { background: var(--teal); color: white; }
+.nav-item i { width: 18px; text-align: center; }
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.logout-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border-radius: 10px;
+  color: rgba(255,255,255,0.5); font-size: 0.88rem;
+  cursor: pointer; background: none; border: none; width: 100%;
+  transition: all .2s; font-family: inherit;
+}
+.logout-btn:hover { color: var(--danger); background: rgba(229,62,62,0.1); }
+
+/* ─── MAIN CONTENT ─── */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; }
+.topbar {
+  background: white; padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar h2 { font-size: 1.2rem; font-weight: 700; color: var(--navy); }
+.topbar-actions { display: flex; gap: 10px; }
+.content { padding: 32px; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 9px; font-family: inherit;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  border: none; transition: all .2s;
+}
+.btn-primary { background: var(--teal); color: white; }
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #c53030; }
+.btn-outline {
+  background: white; color: var(--text); border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #2f855a; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-icon { padding: 8px; border-radius: 8px; }
+
+/* ─── STATS ─── */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 32px; }
+.stat-card {
+  background: white; border-radius: 14px; padding: 22px 24px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+}
+.stat-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.stat-icon.teal { background: var(--teal-light); color: var(--teal); }
+.stat-icon.navy { background: #eef2ff; color: var(--navy); }
+.stat-icon.green { background: var(--success-light); color: var(--success); }
+.stat-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+.stat-value { font-size: 1.6rem; font-weight: 700; color: var(--navy); }
+
+/* ─── PRODUCT TABLE ─── */
+.card {
+  background: white; border-radius: 14px; border: 1px solid var(--border);
+  overflow: hidden;
+}
+.card-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-header h3 { font-size: 1rem; font-weight: 700; color: var(--navy); }
+
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 9px; padding: 8px 14px; width: 260px;
+}
+.search-bar input {
+  border: none; background: none; font-family: inherit;
+  font-size: 0.88rem; outline: none; width: 100%;
+}
+.search-bar i { color: var(--muted); font-size: 0.85rem; }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  text-align: left; padding: 12px 16px;
+  font-size: 0.75rem; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafbfc; }
+tbody td { padding: 14px 16px; font-size: 0.88rem; vertical-align: middle; }
+.product-thumb {
+  width: 44px; height: 44px; border-radius: 8px; background: var(--teal-light);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+}
+.product-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.product-thumb i { color: var(--teal); font-size: 1.1rem; }
+.product-name-cell { display: flex; align-items: center; gap: 12px; }
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600;
+  background: var(--teal-light); color: var(--teal);
+}
+.actions-cell { display: flex; gap: 8px; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,20,40,0.55);
+  z-index: 1000; display: flex; align-items: flex-start;
+  justify-content: center; padding: 24px;
+  overflow-y: auto; opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: white; border-radius: 18px; width: 100%; max-width: 820px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+  transform: translateY(20px); transition: transform .25s;
+  margin: auto;
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+.modal-head {
+  padding: 22px 28px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 { font-size: 1.05rem; font-weight: 700; color: var(--navy); }
+.modal-close {
+  background: var(--bg); border: none; border-radius: 8px;
+  width: 34px; height: 34px; cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: all .2s;
+}
+.modal-close:hover { background: var(--danger-light); color: var(--danger); }
+.modal-body { padding: 28px; }
+.modal-footer {
+  padding: 18px 28px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* ─── FORM ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1/-1; }
+.form-group label { font-size: 0.8rem; font-weight: 600; color: var(--navy); }
+.form-group input, .form-group textarea, .form-group select {
+  padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: 9px; font-family: inherit; font-size: 0.9rem;
+  transition: border-color .2s; outline: none; resize: vertical;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: var(--teal); }
+.form-group textarea { min-height: 90px; }
+
+.section-label {
+  font-size: 0.8rem; font-weight: 700; color: var(--navy);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin: 22px 0 12px; display: flex; align-items: center; gap: 8px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Ingredient list */
+.ingredient-list { display: flex; flex-direction: column; gap: 10px; }
+.ingredient-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 10px; align-items: start;
+  background: var(--bg); padding: 12px; border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.ingredient-row input, .ingredient-row textarea {
+  padding: 8px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: inherit; font-size: 0.85rem;
+  outline: none; width: 100%; background: white; resize: vertical;
+}
+.ingredient-row input:focus, .ingredient-row textarea:focus { border-color: var(--teal); }
+.del-btn {
+  background: var(--danger-light); border: none; border-radius: 8px;
+  width: 32px; height: 32px; cursor: pointer; color: var(--danger);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s; flex-shrink: 0; margin-top: 1px;
+}
+.del-btn:hover { background: #fed7d7; }
+
+/* Quantities */
+.qty-list { display: flex; flex-direction: column; gap: 10px; }
+.qty-row {
+  display: grid; grid-template-columns: 1fr 1fr 2fr auto;
+  gap: 10px; align-items: center;
+  background: var(--bg); padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.qty-row input {
+  padding: 8px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: inherit; font-size: 0.85rem;
+  outline: none; width: 100%; background: white;
+}
+.qty-row input:focus { border-color: var(--teal); }
+
+/* Images */
+.images-input { display: flex; flex-direction: column; gap: 8px; }
+.image-entry { display: flex; gap: 8px; align-items: center; }
+.image-entry input[type="text"] {
+  flex: 1; padding: 8px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: inherit; font-size: 0.85rem;
+  outline: none;
+}
+.image-entry input[type="text"]:focus { border-color: var(--teal); }
+
+/* Upload image button */
+.img-upload-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--bg);
+  color: var(--teal); font-size: 0.82rem; font-weight: 600;
+  white-space: nowrap; transition: all .2s; flex-shrink: 0;
+}
+.img-upload-label:hover { border-color: var(--teal); background: var(--teal-light); }
+.img-upload-label input[type="file"] { display: none; }
+.img-thumb {
+  width: 44px; height: 44px; border-radius: 8px; object-fit: cover;
+  border: 1.5px solid var(--border); flex-shrink: 0; display: none;
+}
+.img-thumb.visible { display: block; }
+.img-path-text {
+  flex: 1; padding: 8px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 0.75rem;
+  outline: none; color: var(--muted); background: var(--bg);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: default;
+}
+
+/* add-row btn */
+.add-row-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px;
+  border: 1.5px dashed var(--border); background: none;
+  color: var(--teal); font-family: inherit; font-size: 0.82rem;
+  font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.add-row-btn:hover { border-color: var(--teal); background: var(--teal-light); }
+
+/* ─── EXPORT PANEL ─── */
+.export-card {
+  background: white; border-radius: 14px; border: 1px solid var(--border);
+  padding: 28px;
+}
+.export-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--navy); }
+.export-card p { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; line-height: 1.6; }
+.steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.step {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 18px; background: var(--bg); border-radius: 10px;
+}
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--teal); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.step p { color: var(--text); font-size: 0.88rem; margin: 0; }
+.step strong { color: var(--navy); font-family: 'DM Mono', monospace; font-size: 0.83rem; }
+
+.preview-code {
+  background: var(--navy); color: #a8d8d0; font-family: 'DM Mono', monospace;
+  font-size: 0.78rem; padding: 18px; border-radius: 10px;
+  max-height: 260px; overflow-y: auto; white-space: pre-wrap;
+  word-break: break-all; line-height: 1.6; margin-top: 16px;
+}
+
+/* ─── TOAST ─── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--navy); color: white; padding: 12px 18px;
+  border-radius: 10px; font-size: 0.88rem; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  display: flex; align-items: center; gap: 10px;
+  animation: slideIn .3s ease; max-width: 320px;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── CONFIRM DIALOG ─── */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(10,20,40,0.6);
+  z-index: 2000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.confirm-overlay.open { opacity: 1; pointer-events: all; }
+.confirm-box {
+  background: white; border-radius: 16px; padding: 28px;
+  max-width: 380px; width: 90%; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.confirm-box .icon { font-size: 2.5rem; color: var(--danger); margin-bottom: 12px; }
+.confirm-box h4 { font-size: 1.1rem; color: var(--navy); margin-bottom: 8px; }
+.confirm-box p { color: var(--muted); font-size: 0.88rem; margin-bottom: 22px; }
+.confirm-btns { display: flex; gap: 10px; justify-content: center; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  text-align: center; padding: 48px;
+  color: var(--muted);
+}
+.empty-state i { font-size: 2.5rem; margin-bottom: 12px; color: var(--border); }
+.empty-state p { font-size: 0.9rem; }
+
+/* ─── SETTINGS PAGE ─── */
+.settings-card {
+  background: white; border-radius: 14px; border: 1px solid var(--border);
+  padding: 28px; margin-bottom: 20px;
+}
+.settings-card h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.settings-card p { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; line-height: 1.6; }
+.settings-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.settings-field label { font-size: 0.8rem; font-weight: 600; color: var(--navy); }
+.settings-field input {
+  padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: 9px; font-family: 'DM Mono', monospace; font-size: 0.88rem;
+  outline: none; transition: border-color .2s;
+}
+.settings-field input:focus { border-color: var(--teal); }
+.token-row { display: flex; gap: 8px; }
+.token-row input { flex: 1; }
+
+/* Deploy button & status */
+.deploy-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 24px; background: #24292e; color: white;
+  border: none; border-radius: 10px; font-family: inherit;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  transition: all .2s; margin-top: 4px;
+}
+.deploy-btn:hover { background: #1a1f23; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
+.deploy-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.deploy-btn i { font-size: 1rem; }
+.deploy-status {
+  margin-top: 16px; padding: 14px 18px; border-radius: 10px;
+  font-size: 0.88rem; font-weight: 500; display: none;
+  align-items: center; gap: 10px;
+}
+.deploy-status.info { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; display: flex; }
+.deploy-status.success { background: var(--success-light); color: #276749; border: 1px solid #9ae6b4; display: flex; }
+.deploy-status.error { background: var(--danger-light); color: var(--danger); border: 1px solid #fed7d7; display: flex; }
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.token-saved-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--success-light); color: var(--success);
+  padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+  margin-left: 10px; vertical-align: middle;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .ingredient-row { grid-template-columns: 1fr 1fr; }
+  .ingredient-row .desc-col { grid-column: 1/-1; }
+  .stats-row { grid-template-columns: 1fr; }
+  .qty-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><i class="fas fa-shield-alt"></i></div>
+    <h1>Admin Panel</h1>
+    <p>Quality Pharmaceuticals — Secure Access</p>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" />
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password" />
+    </div>
+    <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    <div class="login-error" id="loginErr">Invalid credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- ─── APP ─── -->
+<div id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">Quality Pharmaceuticals</div>
+      <div class="brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('products')">
+        <i class="fas fa-box-open"></i> Products
+      </button>
+      <button class="nav-item" onclick="showPage('deploy')">
+        <i class="fab fa-github"></i> Push to GitHub
+      </button>
+      <button class="nav-item" onclick="showPage('export')">
+        <i class="fas fa-download"></i> Export & Deploy
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2 id="pageTitle">Products</h2>
+      <div class="topbar-actions">
+        <button class="btn btn-outline" id="clearCacheBtn" onclick="clearAndReload()" title="Clear saved data and reload" style="color:var(--danger);border-color:var(--danger);">
+          <i class="fas fa-sync"></i> Reset Cache
+        </button>
+        <button class="btn btn-primary" id="addProductBtn" onclick="openAddModal()">
+          <i class="fas fa-plus"></i> Add Product
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Products Page -->
+      <div id="pageProducts">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon teal"><i class="fas fa-box-open"></i></div>
+            <div>
+              <div class="stat-label">Total Products</div>
+              <div class="stat-value" id="statTotal">0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon navy"><i class="fas fa-leaf"></i></div>
+            <div>
+              <div class="stat-label">Total Ingredients</div>
+              <div class="stat-value" id="statIngredients">0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-tags"></i></div>
+            <div>
+              <div class="stat-label">Pack Variants</div>
+              <div class="stat-value" id="statVariants">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>All Products</h3>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Search products…" id="searchInput" oninput="renderTable()">
+            </div>
+          </div>
+          <table id="productTable">
+            <thead>
+              <tr>
+                <th style="width:44%">Product</th>
+                <th>Base Price</th>
+                <th>Ingredients</th>
+                <th>Variants</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Deploy Page -->
+      <div id="pageDeploy" style="display:none;">
+        <div class="settings-card">
+          <h3><i class="fab fa-github" style="margin-right:8px;"></i>GitHub Settings</h3>
+          <p>Your token is stored only in this browser (localStorage). It is never sent anywhere except directly to GitHub API over HTTPS.</p>
+          <div class="settings-field">
+            <label>GitHub Personal Access Token <span id="tokenBadge"></span></label>
+            <div class="token-row">
+              <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+              <button class="btn btn-primary" onclick="saveToken()"><i class="fas fa-save"></i> Save</button>
+              <button class="btn btn-outline" onclick="toggleTokenVisibility()"><i class="fas fa-eye" id="tokenEyeIcon"></i></button>
+            </div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--muted);">
+            <i class="fas fa-info-circle"></i> To create a token: GitHub → Settings → Developer Settings → Personal Access Tokens → Tokens (classic) → Generate new token → check <strong>repo</strong> scope only.
+          </p>
+        </div>
+
+        <div class="settings-card">
+          <h3><i class="fas fa-rocket" style="color:var(--teal);margin-right:8px;"></i>Push to Live Website</h3>
+          <p>This will update <strong>script.js</strong> in your GitHub repo (<code>gaurav-agarwal-github/Quality-Pharmaceuticals</code>, branch <code>main</code>). Vercel will automatically redeploy your site within ~30 seconds.</p>
+
+          <div style="background:var(--bg);border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:0.83rem;color:var(--muted);line-height:1.8;">
+            <strong style="color:var(--navy);">What happens when you click Push:</strong><br>
+            1. Reads your current product data from this panel<br>
+            2. Generates updated <code>script.js</code> content<br>
+            3. Commits it to GitHub via API<br>
+            4. Vercel detects the commit and auto-deploys (~30 sec)<br>
+            5. Your live website is updated ✅
+          </div>
+
+          <button class="deploy-btn" onclick="deployToGitHub()" id="deployBtn">
+            <i class="fab fa-github"></i> Push script.js to GitHub → Deploy Live
+          </button>
+          <div class="deploy-status" id="deployStatus"></div>
+        </div>
+      </div>
+
+      <!-- Export Page -->
+      <div id="pageExport" style="display:none;">
+        <div class="export-card">
+          <h3><i class="fas fa-download" style="color:var(--teal);margin-right:8px;"></i>Export & Deploy</h3>
+          <p>Since your website is static HTML, changes made here are saved in this browser. Use the steps below to apply changes to your live site at <strong>qualitypharmaceuticals.co.in</strong>.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div><p>Click <strong>Download script.js</strong> below — this generates a new script file with all your product edits.</p></div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div><p>Log in to your hosting control panel (cPanel / FTP / File Manager).</p></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div><p>Navigate to your website root and replace the existing <strong>script.js</strong> with the downloaded file.</p></div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div><p>Hard-refresh your website (<strong>Ctrl+Shift+R</strong>) to see the changes live.</p></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="downloadScript()">
+            <i class="fas fa-download"></i> Download Updated script.js
+          </button>
+          <button class="btn btn-outline" style="margin-left:10px;" onclick="previewScript()">
+            <i class="fas fa-eye"></i> Preview Script
+          </button>
+          <div id="scriptPreview" class="preview-code" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PRODUCT MODAL ─── -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add Product</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+      <input type="hidden" id="editIndex" value="-1">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="fName" placeholder="e.g. QuasoCOL">
+        </div>
+        <div class="form-group">
+          <label>Base Price *</label>
+          <input type="text" id="fPrice" placeholder="e.g. ₹100" oninput="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor=''">
+        </div>
+        <div class="form-group full">
+          <label>Description *</label>
+          <textarea id="fDesc" placeholder="Product description…"></textarea>
+        </div>
+      </div>
+
+      <!-- Images -->
+      <div class="section-label">Product Images</div>
+      <div class="images-input" id="imagesInput"></div>
+      <button class="add-row-btn" style="margin-top:8px;" onclick="addImageRow()">
+        <i class="fas fa-plus"></i> Add Image
+      </button>
+
+      <!-- Quantities -->
+      <div class="section-label">Pack Sizes / Quantities</div>
+      <div class="qty-list" id="qtyList"></div>
+      <button class="add-row-btn" style="margin-top:8px;" onclick="addQtyRow()">
+        <i class="fas fa-plus"></i> Add Pack Size
+      </button>
+
+      <!-- Ingredients -->
+      <div class="section-label">Key Ingredients</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:8px 0 6px;font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">
+        <span>Name</span><span>Image Upload</span><span>Description</span>
+      </div>
+      <div class="ingredient-list" id="ingredientList"></div>
+      <button class="add-row-btn" style="margin-top:8px;" onclick="addIngredientRow()">
+        <i class="fas fa-plus"></i> Add Ingredient
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()">
+        <i class="fas fa-save"></i> Save Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONFIRM DIALOG ─── -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="icon"><i class="fas fa-trash-alt"></i></div>
+    <h4>Delete Product?</h4>
+    <p id="confirmMsg">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOASTS ─── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ─── CREDENTIALS (change these!) ─── */
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'QualityPharma@2024';
+
+/* ─── AUTH ─── */
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+function doLogout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+/* ─── PRODUCT DATA (copied from script.js) ─── */
+let products = [
+    {
+        name: "QuasoCOL", price: "₹100",
+        desc: "This proprietary Ayurvedic medicine is a comprehensive herbal formula primarily indicated for addressing menstrual disorders, including painful, irregular, or delayed cycles. Enriched with a potent blend of traditional ingredients such as Ashoka Bark, Kala Jeera, and Arjuna Bark, the syrup is formulated to alleviate physical weakness, anemia, and pelvic pain. Designed for Improved Quality, this health tonic serves as a restorative supplement to support reproductive health and overall vitality.",
+        icon: "fas fa-capsules",
+        images: ["images/QuasoCOL1.png","images/QuasoCOL2.png","images/QuasoCOL3.png","images/QuasoCOL4.png"],
+        ingredients: [
+            { name: "Ashoka Bark", img: "images/Ashoka Bark.jpg", desc: "Ashoka bark is a highly valued Ayurvedic ingredient traditionally used to support women's wellness and reproductive health. It may help promote hormonal balance, comfort, and overall vitality." },
+            { name: "Kala Jeera Seed", img: "images/Kala Jeera Seed.jpg", desc: "Kala Jeera seeds are traditionally used in Ayurveda for their digestive and wellness-supporting properties. They may help support digestion, metabolism, and overall body balance." },
+            { name: "Daru Haldi Rhizome", img: "images/Daru Haldi Rhizome.jpg", desc: "Daru Haldi rhizome is known in Ayurveda for its cleansing and anti-inflammatory properties. It may help support skin health, digestion, immunity, and overall wellness." },
+            { name: "Lal Chandan Powder", img: "images/Lal Chandan Powder.jpg", desc: "Lal Chandan powder, also known as Red Sandalwood, is valued for its cooling and soothing properties. It may help support skin wellness, relaxation, and overall natural balance." },
+            { name: "Chansoor Seed", img: "images/Chansoor Seed.jpg", desc: "Chansoor seeds are rich in nutrients and traditionally used in Ayurveda to support strength, digestion, and overall wellness. They may also help promote energy and nourishment." },
+            { name: "Konch Seed", img: "images/Konch Seed.jpg", desc: "Konch seeds, also known as Mucuna Pruriens, are valued in Ayurveda for supporting strength, stamina, nervous system health, and overall vitality." },
+            { name: "Arjuna Bark", img: "images/Arjuna Bark.jpg", desc: "Arjuna bark is a respected Ayurvedic ingredient traditionally used to support heart health and circulation. It may help promote cardiovascular wellness, stamina, and overall vitality." },
+            { name: "Punarnava Root", img: "images/Punarnava Root.jpg", desc: "Punarnava root is widely used in Ayurveda for its rejuvenating and cleansing properties. It may help support kidney health, digestion, fluid balance, and overall body wellness." },
+            { name: "Palash Flowers", img: "images/Palash Flowers.jpg", desc: "Palash flowers are traditionally used in Ayurveda for their cleansing and wellness-supporting properties. They may help support digestion, skin wellness, and overall natural health." }
+        ],
+        quantities: [{ label: "225ML", price: "₹100" }, { label: "450ML", price: "₹175" }]
+    },
+    {
+        name: "Femina", price: "₹50",
+        desc: "Boosts immunity and overall health. Our Femina capsules contain 500mg of ascorbic acid with added bioflavonoids for enhanced absorption. This powerful antioxidant supports immune system function, collagen synthesis, and protects cells from oxidative stress. Ideal for daily wellness and immune defense.",
+        icon: "fas fa-capsules",
+        images: ["images/Femina1.PNG.png","images/Femina2.PNG.png"],
+        ingredients: [
+            { name: "Ashoka Bark", img: "images/Ashoka Bark.jpg", desc: "Ashoka bark is a revered Ayurvedic herb traditionally used to support women's reproductive health and menstrual wellness." },
+            { name: "Lodhra Bark", img: "images/Lodhra Bark.jpg", desc: "Lodhra bark is widely valued in Ayurveda for its cooling and astringent properties. It may help support women's wellness and promote healthy skin." },
+            { name: "Konch Seed", img: "images/Konch Seed.jpg", desc: "Konch seed is a powerful Ayurvedic ingredient known for supporting strength, stamina, and nervous system health." },
+            { name: "Sonth Rhizome", img: "images/Sonth Rhizome.jpg", desc: "Sonth rhizome, or dried ginger, is highly valued in Ayurveda for its warming and digestive properties." },
+            { name: "Ashwagandha Root", img: "images/Ashwagandha Root.jpg", desc: "Ashwagandha root is a renowned Ayurvedic herb known for its adaptogenic and rejuvenating properties." },
+            { name: "Shatavari Root", img: "images/Shatavari Root.jpg", desc: "Shatavari root is a highly respected Ayurvedic herb traditionally used to support women's health and hormonal balance." },
+            { name: "Gokhru Fruit", img: "images/Gokhru Fruit.jpg", desc: "Gokhru fruit is valued in Ayurveda for supporting urinary health, stamina, and vitality." }
+        ],
+        quantities: [{ label: "10CAPS", price: "₹50" }]
+    },
+    {
+        name: "Liv-top", price: "₹100.00",
+        desc: "Liv-top Syrup is marketed as a Liver Stimulant & Tonic and is intended to be a dietary supplement. Enriched with powerful Ayurvedic herbs including Bhringraj, Arjun bark, Makoi, and Tulsi, it is formulated to support healthy liver function and overall wellness. GMP-certified and trusted since 1967.",
+        icon: "fas fa-lungs",
+        images: ["images/Liv-top 1.PNG.png","images/Liv-top 2.PNG.png","images/Liv-top 3.PNG.png","images/Liv-top 4.PNG.png"],
+        ingredients: [
+            { name: "Bhringraj Plant", img: "images/Bhringraj plant.PNG.jpg", desc: "Bhringraj is a medicinal herb widely used in Ayurveda, known for supporting liver health and hair growth." },
+            { name: "Arjun Bark", img: "images/Arjun Bark.PNG.jpg", desc: "Arjuna bark contains natural antioxidants that may help strengthen heart muscles and improve blood circulation." },
+            { name: "Makoi Fruit", img: "images/Makoi fruit.PNG", desc: "Makoi, also known as Black Nightshade, may help reduce inflammation and support liver function." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi, Holy Basil, is known for boosting immunity and supporting respiratory health." },
+            { name: "Pittapapda Plant", img: "images/Pittapapda plant.PNG", desc: "Pittapapda is an Ayurvedic herb traditionally used for liver health, skin problems, and body cooling." },
+            { name: "Sarpunkha Panchang", img: "images/Sarpunkha Panchang.PNG.PNG", desc: "Sarpunkha is traditionally known for supporting liver and spleen health, improving digestion, and body detoxification." },
+            { name: "Vidanga Seed", img: "images/Vidanga seed.PNG", desc: "Vidanga seeds are widely used for digestive and detox support, with anti-parasitic and antimicrobial properties." },
+            { name: "Ghritkumari Sap", img: "images/Ghritkumari sap.PNG", desc: "Ghritkumari sap (Aloe Vera) may help improve digestion, support liver health, and boost hydration." }
+        ],
+        quantities: [
+            { label: "110ML Syrup", price: "₹70" },
+            { label: "220ML Syrup", price: "₹100" },
+            { label: "30ML Drops", price: "₹50", images: ["images/LivtopDrops1.PNG.png","images/LivtopDrops2.PNG.png"] },
+            { label: "10 CAPS", price: "₹50", images: ["images/Liv-top 7.PNG.png","images/Liv-top 8.PNG.png"] }
+        ]
+    },
+    {
+        name: "QoughSOL", price: "₹50",
+        desc: "QoughSol is an herbal cough syrup that provides quick relief from various cough symptoms. As a GMP-certified product established in 1967, it blends long-standing tradition with certified manufacturing standards to support respiratory health.",
+        icon: "fas fa-bacteria",
+        images: ["images/Qoughsol 1.PNG.png","images/Qoughsol 2.PNG.png","images/Qoughsol 3.PNG.png","images/Qoughsol 4.PNG.png"],
+        ingredients: [
+            { name: "Vasika Leaves", img: "images/Vasika leaf.jpg", desc: "Vasika leaves are a well-known Ayurvedic herb traditionally used to support respiratory and lung health." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi, Holy Basil, is a popular Ayurvedic herb known for boosting immunity and supporting respiratory health." },
+            { name: "Mulethi Rhizome", img: "images/Mulethi rhizome.jpg", desc: "Mulethi (Licorice root) is used in Ayurveda for soothing throat irritation and respiratory support." },
+            { name: "Khareti", img: "images/Khareti.jpg", desc: "Khareti is a traditional Ayurvedic herb known for its strengthening and rejuvenating properties." },
+            { name: "Amaltas Pulp", img: "images/Amaltas pulp.jpg", desc: "Amaltas pulp is a widely used Ayurvedic ingredient known for its gentle cleansing and digestive-supporting properties." },
+            { name: "Neelophar", img: "images/Neelophar.jpg", desc: "Neelophar (Blue Lotus) may help promote relaxation, reduce stress, and support restful sleep." },
+            { name: "Unnab", img: "images/Unnab.jpg", desc: "Unnab (Jujube) may help support respiratory health, improve digestion, and strengthen immunity." },
+            { name: "Banafsha", img: "images/Banafsha.jpg", desc: "Banafsha (Sweet Violet) may help support respiratory health and relieve cough and throat irritation." },
+            { name: "Peppermint", img: "images/Peppermint.jpg", desc: "Peppermint is a refreshing herb known for its cooling and digestive-supporting properties." }
+        ],
+        quantities: [{ label: "60ML", price: "₹50" }, { label: "110ML", price: "₹70" }]
+    },
+    {
+        name: "Infantol (Babies Tonic)", price: "₹55",
+        desc: "Infantol (Babies Tonic) is a gentle health tonic specially formulated for babies to support healthy growth, digestion, immunity, and overall development. Made with carefully selected ingredients, it helps promote strength, appetite, and daily wellness in growing children.",
+        icon: "fas fa-bone",
+        images: ["images/Infantol (Babies Tonic)1.PNG.png","images/Infantol (Babies Tonic)2.PNG.png","images/Infantol (Babies Tonic)3.PNG.png","images/Infantol (Babies Tonic)4.PNG.png"],
+        ingredients: [
+            { name: "Javitri Leaves", img: "images/Javitri leaves.jpg", desc: "Javitri leaves are valued for their aromatic and wellness-supporting properties." },
+            { name: "Pushkarmool Root", img: "images/Pushkarmool root.jpg", desc: "Pushkarmool root is used to support respiratory and heart health." },
+            { name: "Atis Root", img: "images/Atis root.jpg", desc: "Atis root is valued for its digestive and wellness-supporting properties." },
+            { name: "Black Pepper Seeds", img: "images/Black Pepper seeds.jpg", desc: "Black Pepper seeds may help improve digestion and boost immunity." },
+            { name: "Unnab", img: "images/Unnab.jpg", desc: "Unnab (Jujube) supports respiratory health, digestion, and immunity." },
+            { name: "Nagarmotha Root", img: "images/Nagarmotha root.jpg", desc: "Nagarmotha root is known for its digestive and detoxifying properties." },
+            { name: "Kantkari", img: "images/Kantkari.jpg", desc: "Kantkari is widely used for respiratory health support." },
+            { name: "Baheda Root", img: "images/Baheda root.jpg", desc: "Baheda root is valued for its detoxifying and rejuvenating properties." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi boosts immunity and supports respiratory health." }
+        ],
+        quantities: [
+            { label: "60ML Syrup", price: "₹55" },
+            { label: "30ML Drops", price: "₹45", images: ["images/Infantol Drops1.PNG.png","images/Infantol Drops2.PNG.png","images/Infantol Drops3.PNG.png","images/Infantol Drops4.PNG.png"] }
+        ]
+    },
+    {
+        name: "Infantol (Family Tonic)", price: "₹70",
+        desc: "Infantol (Family Tonic) is a nourishing family health tonic formulated to support overall wellness, immunity, digestion, and daily energy levels. Enriched with beneficial herbal ingredients, it helps maintain strength and vitality for all age groups as part of a healthy lifestyle.",
+        icon: "fas fa-heart",
+        images: ["images/Infantol1.PNG.png","images/Infantol2.PNG.png","images/Infantol3.PNG.png","images/Infantol4.PNG.png"],
+        ingredients: [
+            { name: "Pokharmool Root", img: "images/Pokharmool root.jpg", desc: "Pokharmool root is valued for supporting respiratory and heart health." },
+            { name: "Atees Root", img: "images/Atees root.jpg", desc: "Atees root supports digestion, appetite, and overall wellness." },
+            { name: "Pepper Seed", img: "images/pepper seed.jpg", desc: "Pepper seeds support digestion, metabolism, and immunity." },
+            { name: "Unnab", img: "images/Unnab.jpg", desc: "Unnab (Jujube) supports respiratory health and immunity." },
+            { name: "Nagarmotha Root", img: "images/Nagarmotha root.jpg", desc: "Nagarmotha root supports digestion and detoxification." },
+            { name: "Kantkari Herb", img: "images/Kantkari herb.jpg", desc: "Kantkari supports respiratory wellness." },
+            { name: "Baheda Root", img: "images/Baheda root.jpg", desc: "Baheda root supports detoxification and respiratory health." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi boosts immunity and supports respiratory health." },
+            { name: "Bhringraj Seed", img: "images/Bhringraj seed.jpg", desc: "Bhringraj seeds support hair health, liver function, and overall wellness." }
+        ],
+        quantities: [{ label: "100ML", price: "₹70" }, { label: "200ML", price: "₹100" }]
+    },
+    {
+        name: "Energyon", price: "₹110",
+        desc: "EnergyOn Syrup is a proprietary Ayurvedic restorative tonic designed to support overall physical and mental well-being. Formulated with Ashwagandha, Shatavari, Kesar (Saffron), and Amla, this syrup is indicated for addressing poor stamina, malnutrition, and lack of appetite.",
+        icon: "fas fa-bolt",
+        images: ["images/Energyon1.png","images/Energyon2.png","images/Energyon3.png","images/Energyon4.png"],
+        ingredients: [
+            { name: "Ashwagandha Root", img: "images/Ashwagandha Root.jpg", desc: "Ashwagandha root is known for its adaptogenic and rejuvenating properties." },
+            { name: "Shatawari Root", img: "images/Shatawari Root.jpg", desc: "Shatawari root supports vitality, hormonal balance, and overall wellness." },
+            { name: "Kavach Seed", img: "images/Kavach Seed.jpg", desc: "Kavach seed supports strength, stamina, and nervous system health." },
+            { name: "Vidarikand Root", img: "images/Vidarikand Root.jpg", desc: "Vidarikand root supports energy, physical strength, and immunity." },
+            { name: "Shankhpushpi Herb", img: "images/Shankhpushpi Herb.jpg", desc: "Shankhpushpi supports memory, focus, and mental wellness." },
+            { name: "Brahmi Booti", img: "images/Brahmi Booti.jpg", desc: "Brahmi supports memory, concentration, and nervous system wellness." },
+            { name: "Amla Fruit", img: "images/Amla Fruit.jpg", desc: "Amla is rich in antioxidants and Vitamin C, supporting immunity and digestion." },
+            { name: "Punarnava Root", img: "images/Punarnava Root.jpg", desc: "Punarnava root supports kidney health, digestion, and overall body wellness." },
+            { name: "Arjuna Bark", img: "images/Arjuna Bark.jpg", desc: "Arjuna bark supports heart health, circulation, and overall vitality." }
+        ],
+        quantities: [
+            { label: "100ML Syrup", price: "₹70" },
+            { label: "200ML Syrup", price: "₹100" },
+            { label: "10CAPS", price: "₹110", images: ["images/Energyoncaps1.png","images/Energyoncaps2.png"] }
+        ]
+    },
+    {
+        name: "M.C Plus", price: "₹60",
+        desc: "M.C Plus is a specialized Ayurvedic proprietary medicine formulated to support women's reproductive wellness. Designed for menstrual irregularities, these capsules leverage a traditional blend of botanical extracts to help regulate and restore a healthy monthly cycle.",
+        icon: "fas fa-female",
+        images: ["images/M.C Plus syrup1.PNG.png","images/M.C Plus syrup2.PNG.png","images/M.C Plus syrup3.PNG.png","images/M.C Plus syrup4.PNG.png"],
+        ingredients: [
+            { name: "Kalaunji", img: "images/Kalaunji.PNG.png", desc: "Kalonji (Black Seed) may help support immunity, digestion, and heart health." },
+            { name: "Kapasmool", img: "images/Kapasmool.PNG.png", desc: "Kapasmool supports women's health, digestion, and pain relief." },
+            { name: "Olatkambal", img: "images/Olatkambal.PNG.png", desc: "Olatkambal root supports women's reproductive health and healthy menstrual cycles." },
+            { name: "Gajar Seed", img: "images/Gajar seed.PNG.png", desc: "Gajar seeds support digestion, urinary health, and body balance." },
+            { name: "Indrayan", img: "images/Indrayan.PNG.png", desc: "Indrayan supports detoxification and digestive health." },
+            { name: "Soya", img: "images/Soya.PNG.png", desc: "Soya seeds are rich in protein, fiber, vitamins, and antioxidants." },
+            { name: "Kala Til", img: "images/Kala Til.PNG.jpg", desc: "Kala Til (Black Sesame) supports bone strength, heart health, and digestion." },
+            { name: "Muli", img: "images/Muli.PNG.png", desc: "Muli seeds support digestion and liver function." },
+            { name: "Sonth", img: "images/Sonth.PNG.png.jpg", desc: "Sonth (Dry Ginger) improves digestion and reduces inflammation." }
+        ],
+        quantities: [
+            { label: "100ML Syrup", price: "₹80" },
+            { label: "200ML Syrup", price: "₹125" },
+            { label: "6CAPS", price: "₹60", images: ["images/M.E Plus1.PNG.png","images/M.E Plus2.PNG.png"] }
+        ]
+    },
+    {
+        name: "Quality LAL TEL", price: "₹50",
+        desc: "Quality Lal Tel is a premium baby massage oil specially formulated to strengthen bones and improve muscle tone. Enriched with Till Oil (Sesame) and traditional herbs like Shankhapushpi and Arjuna Bark, this GMP-certified oil deeply nourishes delicate skin while promoting physical development.",
+        icon: "fas fa-baby",
+        images: ["images/Quality lal tel1.PNG.png","images/Quality lal tel2.PNG.png","images/Quality lal tel3.PNG.png","images/Quality lal tel4.PNG.png"],
+        ingredients: [
+            { name: "Shankhapushpi", img: "images/Shankhapushpi.jpg", desc: "Shankhapushpi supports brain and nervous system health." },
+            { name: "Manjistha Root", img: "images/Manjistha root.jpg", desc: "Manjistha root supports healthy skin and natural body cleansing." },
+            { name: "Daruharidra Root", img: "images/Daruharidra root.jpg", desc: "Daruharidra root supports liver health, healthy skin, and immunity." },
+            { name: "Arjun Bark", img: "images/Arjun Bark.PNG.jpg", desc: "Arjuna bark supports heart health and blood circulation." },
+            { name: "Urad Seeds", img: "images/Urad seeds.jpg", desc: "Urad seeds are highly nutritious, supporting strength and digestion." },
+            { name: "Ratanjot", img: "images/Ratanjot.jpg", desc: "Ratanjot supports skin health with cooling and anti-inflammatory properties." },
+            { name: "Karpoor", img: "images/Karpoor.jpg", desc: "Karpoor (Camphor) supports respiratory comfort and relaxation." },
+            { name: "Neem Oil", img: "images/Neem oil.jpg", desc: "Neem oil supports healthy skin and protection from infections." },
+            { name: "Kala Til Oil", img: "images/Til tel.jpg", desc: "Sesame oil supports joint and bone health and promotes overall strength." }
+        ],
+        quantities: [{ label: "50ML", price: "₹50" }, { label: "100ML", price: "₹80" }]
+    },
+    {
+        name: "Quality Gripe Water", price: "₹43",
+        desc: "Quality Gripe Water is a trusted Ayurvedic formulation designed to provide gentle relief for babies from common digestive discomforts including colic, gas, and indigestion. Made with time-tested herbal ingredients, it supports healthy digestion and comfort in infants.",
+        icon: "fas fa-baby",
+        images: [],
+        ingredients: [
+            { name: "Bhringraj Plant", img: "images/Bhringraj plant.PNG.jpg", desc: "Bhringraj supports liver health and overall wellness." },
+            { name: "Arjun Bark", img: "images/Arjun Bark.PNG.jpg", desc: "Arjuna bark supports heart health and blood circulation." },
+            { name: "Makoi Fruit", img: "images/Makoi fruit.PNG", desc: "Makoi supports liver function and improves digestion." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi boosts immunity and supports respiratory health." },
+            { name: "Pittapapda Plant", img: "images/Pittapapda plant.PNG", desc: "Pittapapda supports liver health, skin wellness, and body cooling." },
+            { name: "Sarpunkha Panchang", img: "images/Sarpunkha Panchang.PNG.PNG", desc: "Sarpunkha supports liver and spleen health and body detoxification." },
+            { name: "Vidanga Seed", img: "images/Vidanga seed.PNG", desc: "Vidanga seeds support gut health and natural body cleansing." },
+            { name: "Ghritkumari Sap", img: "images/Ghritkumari sap.PNG", desc: "Aloe Vera sap supports liver health, digestion, and hydration." }
+        ],
+        quantities: [{ label: "100ML", price: "₹43" }]
+    },
+    {
+        name: "DADOL Skin Ointment", price: "₹45",
+        desc: "This Ayurvedic skin ointment is a specialized herbal formula enriched with Neem to effectively treat various fungal and inflammatory skin conditions. It is specifically indicated for the relief of ringworm, scabies, eczema, and itchy skin.",
+        icon: "fas fa-spray-can",
+        images: ["images/DADOL1.png","images/DADOL2.png"],
+        ingredients: [
+            { name: "Gandhak", img: "images/Gandhak.jpg", desc: "Gandhak (purified Sulphur) supports healthy skin and reduces itching." },
+            { name: "Babchi Oil", img: "images/Babchi Oil.jpg", desc: "Babchi Oil supports healthy skin texture and skin balance." },
+            { name: "Coaltar Solution", img: "images/Coaltar Solution.jpg", desc: "Coaltar Solution soothes dry and irritated skin conditions." },
+            { name: "Neem Oil", img: "images/Neem Oil.jpg", desc: "Neem Oil supports skin health and reduces irritation." },
+            { name: "Samudraphene", img: "images/Samudraphene.jpg", desc: "Samudraphene supports skin comfort and wellness." },
+            { name: "Maulshri Flowers", img: "images/Maulshri Flowers.jpg", desc: "Maulshri Flowers support skin nourishment and freshness." },
+            { name: "Babool Flowers", img: "images/Babool Flowers.jpg", desc: "Babool Flowers support healthy skin and natural balance." },
+            { name: "Paraffin Base", img: "images/Paraffin Base.jpg", desc: "Paraffin Base keeps skin soft and supports hydration." }
+        ],
+        quantities: [{ label: "10GM", price: "₹45" }]
+    },
+    {
+        name: "Joint Pain Relieve Oil", price: "₹25",
+        desc: "This Joint Pain Reliever Oil is a premium Ayurvedic formulation designed to provide fast and effective relief from chronic discomfort. Enriched with Ashwagandha, Shatavari, and Maha Haldi, it targets inflammation at the source to ease joint pains, arthritis, and muscle stiffness.",
+        icon: "fas fa-bone",
+        images: ["images/Zoint oil1.PNG.png","images/Zoint oil2.PNG.png","images/Zoint oil3.PNG.png","images/Zoint oil4.PNG.png"],
+        ingredients: [
+            { name: "Ashwagandha Root", img: "images/Ashwagangha root.jpg", desc: "Ashwagandha root supports energy, stamina, and overall wellness." },
+            { name: "Karpoor Crystal", img: "images/Karpoor Crystal.jpg", desc: "Karpoor crystal supports respiratory comfort and relaxation." },
+            { name: "Mash (Urad) Seed", img: "images/Mash Urad Seed.jpg", desc: "Urad seeds are rich in protein and support strength and digestion." },
+            { name: "Jatamansi Plant", img: "images/Jatamansi Plant.jpg", desc: "Jatamansi supports calming, restful sleep, and mental clarity." },
+            { name: "Kuchala Seed", img: "images/Kuchala Seed.jpg", desc: "Kuchala seeds support nervous system function and joint comfort." },
+            { name: "Dhatura Leaf", img: "images/Dhatura Leaf.jpg", desc: "Dhatura leaves support pain and respiratory relief." },
+            { name: "Aama Haldi Root", img: "images/Aama Haldi Root.jpg", desc: "Aama Haldi root supports digestion and reduces inflammation." },
+            { name: "Shatawari Root", img: "images/Shatawari Root.jpg", desc: "Shatawari root supports hormonal balance and overall rejuvenation." }
+        ],
+        quantities: [
+            { label: "10ML", price: "₹25" },
+            { label: "30ML", price: "₹75" },
+            { label: "60ML", price: "₹120" }
+        ]
+    },
+    {
+        name: "EAROL", price: "₹45",
+        desc: "Earol Ear Drops is a proprietary Ayurvedic formulation designed to provide fast-acting and comprehensive relief from common ear discomforts including ear-ache, itching, ear wax buildup, and decreased hearing clarity.",
+        icon: "fas fa-seedling",
+        images: ["images/Earoil1.PNG.png","images/Earoil2.PNG.png","images/Earoil3.PNG.png","images/Earoil4.PNG.png"],
+        ingredients: [
+            { name: "Sonapatha", img: "images/Sonapatha.jpg", desc: "Sonapatha supports joint health, digestion, and respiratory wellness." },
+            { name: "Ankol", img: "images/Ankol.jpg", desc: "Ankol supports skin health, joint comfort, and digestion." },
+            { name: "Kakjangha", img: "images/Kakjangha.jpg", desc: "Kakjangha supports joint health and overall physical wellness." },
+            { name: "Nagdaun", img: "images/Nagdaun.jpg", desc: "Nagdaun supports digestion, respiratory comfort, and detoxification." },
+            { name: "Arjuna", img: "images/Arjuna.jpg", desc: "Arjuna supports healthy blood circulation and heart wellness." },
+            { name: "Surajmukhi", img: "images/Surajmukhi.jpg", desc: "Surajmukhi (Sunflower) supports heart health and energy levels." },
+            { name: "Nirgundi", img: "images/Nirgundi.jpg", desc: "Nirgundi supports joint comfort and respiratory wellness." },
+            { name: "Lahsun", img: "images/Lahsun.jpg", desc: "Lahsun (Garlic) supports heart health, digestion, and immunity." }
+        ],
+        quantities: [{ label: "5ML", price: "₹45" }]
+    },
+    {
+        name: "Mangal Prabhat (Laxative Churan)", price: "₹16",
+        desc: "Mangal Prabhat Churn is a time-tested Ayurvedic remedy formulated to combat chronic constipation, hyperacidity, and heartburn. This GMP-certified, Saunf-flavored churan promotes healthy bowel movements and regulates acid levels.",
+        icon: "fas fa-hand-holding-medical",
+        images: ["images/Mangal Prabhat1.PNG.png","images/Mangal Prabhat2.PNG.png","images/Mangal Prabhat3.PNG.png"],
+        ingredients: [
+            { name: "Senna Leaf", img: "images/Senna Leaf.jpg", desc: "Senna leaves support natural cleansing and digestive health." },
+            { name: "Ajwain Seed", img: "images/Ajwain Seed.jpg", desc: "Ajwain seeds relieve indigestion, bloating, and gas." },
+            { name: "Kala Namak", img: "images/Kala Namak.jpg", desc: "Kala Namak (Black Salt) supports digestion and appetite." },
+            { name: "Nisoth", img: "images/Nisoth.jpg", desc: "Nisoth supports detoxification and healthy bowel function." },
+            { name: "Amaltash Pulp", img: "images/Amaltash Pulp.jpg", desc: "Amaltash pulp supports constipation relief and bowel health." },
+            { name: "Gulab Flowers", img: "images/Gulab Flowers.jpg", desc: "Gulab flowers support skin health and relaxation." },
+            { name: "Saunf", img: "images/Saunf.jpg", desc: "Saunf (Fennel) improves digestion, freshens breath, and reduces acidity." },
+            { name: "Sentha Namak", img: "images/Sentha Namak.jpg", desc: "Sentha Namak (Rock Salt) supports digestion and mineral balance." },
+            { name: "Yastimadhu", img: "images/Yastimadhu.jpg", desc: "Yastimadhu (Mulethi/Licorice) supports respiratory health and digestion." }
+        ],
+        quantities: [{ label: "10GM", price: "₹16" }, { label: "50GM", price: "₹55" }]
+    },
+    {
+        name: "Amrit (Anti Dycentrical)", price: "₹40",
+        desc: "Amrit Anti-Diarrheal Tablets provide a trusted, natural approach to digestive health. This Ayurvedic remedy is specifically formulated to manage diarrhea and dysentery, helping to soothe the digestive tract and restore normal function quickly and effectively.",
+        icon: "fas fa-pills",
+        images: ["images/Amrit.PNG.png"],
+        ingredients: [
+            { name: "Bhringraj Plant", img: "images/Bhringraj plant.PNG.jpg", desc: "Bhringraj supports liver health and overall wellness." },
+            { name: "Arjun Bark", img: "images/Arjun Bark.PNG.jpg", desc: "Arjuna bark supports heart health and blood circulation." },
+            { name: "Makoi Fruit", img: "images/Makoi fruit.PNG", desc: "Makoi supports liver function and improves digestion." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi boosts immunity and supports respiratory health." },
+            { name: "Pittapapda Plant", img: "images/Pittapapda plant.PNG", desc: "Pittapapda supports liver health and body cooling." },
+            { name: "Sarpunkha Panchang", img: "images/Sarpunkha Panchang.PNG.PNG", desc: "Sarpunkha supports liver and spleen health and detoxification." },
+            { name: "Vidanga Seed", img: "images/Vidanga seed.PNG", desc: "Vidanga seeds support gut health and natural body cleansing." },
+            { name: "Ghritkumari Sap", img: "images/Ghritkumari sap.PNG", desc: "Aloe Vera sap supports liver health, digestion, and hydration." }
+        ],
+        quantities: [{ label: "25 Tabs", price: "₹40" }, { label: "500 Tabs", price: "₹500" }]
+    },
+    {
+        name: "Woemol (Antiwarm)", price: "₹29",
+        desc: "Woemol is an Ayurvedic formulation designed to address common digestive concerns including worm-related issues. Made with time-tested herbal ingredients, it supports healthy gut function and digestive wellness.",
+        icon: "fas fa-thermometer-half",
+        images: [],
+        ingredients: [
+            { name: "Bhringraj Plant", img: "images/Bhringraj plant.PNG.jpg", desc: "Bhringraj supports liver health and overall wellness." },
+            { name: "Arjun Bark", img: "images/Arjun Bark.PNG.jpg", desc: "Arjuna bark supports heart health and blood circulation." },
+            { name: "Makoi Fruit", img: "images/Makoi fruit.PNG", desc: "Makoi supports liver function and improves digestion." },
+            { name: "Tulsi Leaf", img: "images/Tulsi leaf.PNG", desc: "Tulsi boosts immunity and supports respiratory health." },
+            { name: "Pittapapda Plant", img: "images/Pittapapda plant.PNG", desc: "Pittapapda supports liver health and body cooling." },
+            { name: "Sarpunkha Panchang", img: "images/Sarpunkha Panchang.PNG.PNG", desc: "Sarpunkha supports liver and spleen health and detoxification." },
+            { name: "Vidanga Seed", img: "images/Vidanga seed.PNG", desc: "Vidanga seeds support gut health and natural body cleansing." },
+            { name: "Ghritkumari Sap", img: "images/Ghritkumari sap.PNG", desc: "Aloe Vera sap supports liver health, digestion, and hydration." }
+        ],
+        quantities: [{ label: "30ML", price: "₹29" }]
+    },
+    {
+        name: "Mal Mix", price: "₹32",
+        desc: "MALMIX Syrup is a proprietary Ayurvedic medicine formulated to act as an effective anti-malarial and anti-pyretic treatment. This time-tested remedy, with a heritage dating back to 1967, is crafted in a GMP-certified facility.",
+        icon: "fas fa-dumbbell",
+        images: ["images/Mal Mix.PNG.png"],
+        ingredients: [
+            { name: "Agnihas Herb", img: "images/Agnihas Herb.jpg", desc: "Agnihas Herb supports digestion, metabolism, and natural detoxification." },
+            { name: "Bindal Fruit", img: "images/Bindal Fruit.jpg", desc: "Bindal Fruit supports digestive health and body strength." },
+            { name: "Kanchana", img: "images/Kanchana.jpg", desc: "Kanchana supports glandular health and healthy metabolism." },
+            { name: "Guduchi Root", img: "images/Guduchi Root.jpg", desc: "Guduchi (Giloy) supports immunity, digestion, and energy levels." },
+            { name: "Chiretta Fruit", img: "images/Chiretta Fruit.jpg", desc: "Chiretta Fruit supports liver wellness and natural detoxification." },
+            { name: "Nagpheni", img: "images/Nagpheni.jpg", desc: "Nagpheni supports digestion, body hydration, and skin wellness." },
+            { name: "Shankhauli", img: "images/Shankhauli.jpg", desc: "Shankhauli supports digestion, body strength, and overall wellness." }
+        ],
+        quantities: [{ label: "30ML", price: "₹32" }, { label: "60ML", price: "₹45" }]
+    },
+    {
+        name: "Gas Q", price: "₹70",
+        desc: "Gas-Q Gastric Syrup is a premium Ayurvedic digestive aid designed to provide rapid relief from gastric problems, acidity, and flatulence. Utilizing Saunf, Podina, Ajmoda, and Jeera, this GMP-certified syrup soothes the digestive tract and improves overall gut health.",
+        icon: "fas fa-leaf",
+        images: ["images/Gas Q1.PNG.png","images/Gas Q2.PNG.png","images/Gas Q3.PNG.png","images/Gas Q4.PNG.png"],
+        ingredients: [
+            { name: "Saunf Big", img: "images/Saunf Big.jpg", desc: "Saunf (Fennel) improves digestion, reduces bloating, and freshens breath." },
+            { name: "Jeera Black", img: "images/Jeera Black Seed.jpg", desc: "Black Jeera supports healthy digestion and reduces gas." },
+            { name: "Podina Leaf", img: "images/Podina Leaf.jpg", desc: "Podina (Mint) supports digestion and relieves nausea." },
+            { name: "Dhania Seed", img: "images/Dhania Seed.jpg", desc: "Dhania seeds support healthy digestion and reduce acidity." },
+            { name: "Harad Small", img: "images/Harad Small Fruit.jpg", desc: "Harad Small Fruit supports digestion, gut health, and detoxification." },
+            { name: "Makoy Fruit", img: "images/Makoy Fruit.jpg", desc: "Makoy fruit supports liver function and natural detoxification." },
+            { name: "Baheda Fruit", img: "images/Baheda Fruit.jpg", desc: "Baheda fruit supports digestion, respiratory health, and immunity." },
+            { name: "Ajmoda Seed", img: "images/Ajmoda Seed.jpg", desc: "Ajmoda seeds support digestion and reduce bloating." },
+            { name: "Guduch Root", img: "images/Guduch Root.jpg", desc: "Guduch (Giloy) supports immunity, energy, and overall health." }
+        ],
+        quantities: [{ label: "110ML", price: "₹70" }, { label: "220ML", price: "₹100" }]
+    },
+    {
+        name: "Dige Q", price: "₹70",
+        desc: "Dige-Q Digestive Syrup is an Ayurvedic medicine formulated over 51 years in healthcare. This GMP-certified syrup is an effective remedy for indigestion, lack of appetite, and various gastric and stomach troubles.",
+        icon: "fas fa-heartbeat",
+        images: ["images/Dige Q1.PNG.png","images/Dige Q2.PNG.png","images/Dige Q3.PNG.png","images/Dige Q4.PNG.png"],
+        ingredients: [
+            { name: "Harad Fruit", img: "images/Harad Fruit.jpg", desc: "Harad (Haritaki) supports healthy digestion and natural body cleansing." },
+            { name: "Baheda Fruit", img: "images/Baheda Fruit.jpg", desc: "Baheda supports respiratory health, digestion, and detoxification." },
+            { name: "Amla Fruit", img: "images/Amla Fruit.jpg", desc: "Amla is rich in Vitamin C and antioxidants, supporting immunity." },
+            { name: "Sonth Rhizome", img: "images/Sonth Rhizome.jpg", desc: "Sonth (Dry Ginger) improves digestion and reduces bloating." },
+            { name: "Pippli Seed", img: "images/Pippli Seed.jpg", desc: "Pippli (Long Pepper) supports digestion and respiratory health." },
+            { name: "Methi Seed", img: "images/Methi Seed.jpg", desc: "Methi seeds support digestion and healthy metabolism." },
+            { name: "Jeera Seed", img: "images/Jeera Seed.jpg", desc: "Jeera seeds improve appetite and support digestive comfort." },
+            { name: "Ajmoda Seed", img: "images/Ajmoda Seed.jpg", desc: "Ajmoda seeds support digestion and reduce bloating." },
+            { name: "Guduch Root", img: "images/Guduch Root.jpg", desc: "Guduch (Giloy) supports immunity, digestion, and energy." }
+        ],
+        quantities: [{ label: "110ML", price: "₹70" }, { label: "220ML", price: "₹100" }]
+    },
+    {
+        name: "Memory Q", price: "₹100",
+        desc: "Memory-Q Syrup is a premium Ayurvedic brain tonic and memory booster designed to enhance cognitive function and mental clarity. Enriched with Ashwagandha, Brahmi, Shankhapushpi, and Saffron, it supports peak mental performance and focus.",
+        icon: "fas fa-brain",
+        images: ["images/Memory Q1.PNG.png","images/Memory Q2.PNG.png","images/Memory Q3.PNG.png","images/Memory Q4.PNG.png"],
+        ingredients: [
+            { name: "Ashwagandha Root", img: "images/Ashwagandha Root.jpg", desc: "Ashwagandha root supports energy, stamina, and overall wellness." },
+            { name: "Shatawari Root", img: "images/Shatawari Root.jpg", desc: "Shatawari root supports nourishment, strength, and wellness." },
+            { name: "Kavach Seed", img: "images/Kavach Seed.jpg", desc: "Kavach seed supports strength, vitality, and nervous system health." },
+            { name: "Vidarikand Root", img: "images/Vidarikand Root.jpg", desc: "Vidarikand root supports energy and physical wellness." },
+            { name: "Shankhapushpi Herb", img: "images/Shankhapushpi Herb.jpg", desc: "Shankhapushpi supports memory, concentration, and mental clarity." },
+            { name: "Brahmi Booti", img: "images/Brahmi Booti.jpg", desc: "Brahmi supports memory, focus, and nervous system health." },
+            { name: "Amla Fruit", img: "images/Amla Fruit.jpg", desc: "Amla supports immunity, digestion, and overall wellness." },
+            { name: "Punarnava Root", img: "images/Punarnava Root.jpg", desc: "Punarnava root supports kidney and liver health." },
+            { name: "Arjuna Bark", img: "images/Arjuna Bark.jpg", desc: "Arjuna bark supports heart health and blood circulation." }
+        ],
+        quantities: [{ label: "220ML", price: "₹100" }]
+    }
+];
+
+/* ─── INIT ─── */
+function initApp() {
+  // Load from localStorage if saved
+  const saved = localStorage.getItem('qp_products');
+  if (saved) {
+    try {
+      products = JSON.parse(saved);
+    } catch(e) {
+      console.warn('Failed to parse saved products, using defaults');
+    }
+  }
+  updateStats();
+  renderTable();
+}
+
+function clearAndReload() {
+  if (confirm('This will clear all locally saved changes and reload the default product data. Are you sure?')) {
+    localStorage.removeItem('qp_products');
+    location.reload();
+  }
+}
+
+function save() {
+  localStorage.setItem('qp_products', JSON.stringify(products));
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = products.length;
+  document.getElementById('statIngredients').textContent =
+    products.reduce((s, p) => s + (p.ingredients?.length || 0), 0);
+  document.getElementById('statVariants').textContent =
+    products.reduce((s, p) => s + (p.quantities?.length || 0), 0);
+}
+
+/* ─── TABLE ─── */
+function renderTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const tbody = document.getElementById('tableBody');
+  const filtered = products.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-search"></i><p>No products match your search.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((p, fi) => {
+    const realIdx = products.indexOf(p);
+    const imgSrc = p.images?.[0];
+    return `<tr>
+      <td>
+        <div class="product-name-cell">
+          <div class="product-thumb">
+            ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><i class='fas fa-pills' style='display:none;color:var(--teal);'></i>` : `<i class="fas fa-pills" style="color:var(--teal);"></i>`}
+          </div>
+          <strong>${p.name}</strong>
+        </div>
+      </td>
+      <td>${p.price}</td>
+      <td><span class="tag">${p.ingredients?.length || 0} herbs</span></td>
+      <td><span class="tag">${p.quantities?.length || 0} packs</span></td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-outline btn-sm btn-icon" title="Edit" onclick="openEditModal(${realIdx})">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="confirmDelete(${realIdx}, '${p.name.replace(/'/g,"\\'")}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─── MODAL ─── */
+function openAddModal() {
+  document.getElementById('editIndex').value = -1;
+  document.getElementById('modalTitle').textContent = 'Add New Product';
+  document.getElementById('fName').value = '';
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('imagesInput').innerHTML = '';
+  document.getElementById('qtyList').innerHTML = '';
+  document.getElementById('ingredientList').innerHTML = '';
+  addImageRow(); addQtyRow(); addIngredientRow();
+  openModal();
+}
+
+function openEditModal(idx) {
+  const p = products[idx];
+  document.getElementById('editIndex').value = idx;
+  document.getElementById('modalTitle').textContent = 'Edit Product';
+  document.getElementById('fName').value = p.name;
+  document.getElementById('fPrice').value = p.price;
+  document.getElementById('fDesc').value = p.desc;
+
+  // Images
+  const imgC = document.getElementById('imagesInput');
+  imgC.innerHTML = '';
+  (p.images || []).forEach(src => addImageRow(src));
+  if (!(p.images?.length)) addImageRow();
+
+  // Quantities
+  const qtyC = document.getElementById('qtyList');
+  qtyC.innerHTML = '';
+  (p.quantities || []).forEach(q => addQtyRow(q.label, q.price, (q.images || []).join(',')));
+  if (!(p.quantities?.length)) addQtyRow();
+
+  // Ingredients
+  const ingC = document.getElementById('ingredientList');
+  ingC.innerHTML = '';
+  (p.ingredients || []).forEach(i => addIngredientRow(i.name, i.img, i.desc));
+  if (!(p.ingredients?.length)) addIngredientRow();
+
+  openModal();
+}
+
+function openModal() {
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function saveProduct() {
+  const name = document.getElementById('fName').value.trim();
+  const price = document.getElementById('fPrice').value.trim();
+  const desc = document.getElementById('fDesc').value.trim();
+  if (!name || !price || !desc) { showToast('Please fill in Name, Price, and Description.', 'error'); return; }
+
+  // Collect images
+  const images = [...document.querySelectorAll('#imagesInput .image-entry')]
+    .map(d => d.dataset.imgSrc || '').filter(Boolean);
+
+  // Collect quantities
+  const quantities = [...document.querySelectorAll('.qty-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    const obj = { label: inputs[0].value.trim(), price: inputs[1].value.trim() };
+    const imgs = inputs[2].value.trim();
+    if (imgs) obj.images = imgs.split(',').map(s => s.trim()).filter(Boolean);
+    return obj;
+  }).filter(q => q.label);
+
+  // Collect ingredients
+  const ingredients = [...document.querySelectorAll('.ingredient-row')].map(row => {
+    const nameInput = row.querySelector('input[type="text"]');
+    const descTA = row.querySelector('textarea');
+    return { name: nameInput.value.trim(), img: row.dataset.imgSrc || '', desc: descTA.value.trim() };
+  }).filter(i => i.name);
+
+  const product = { name, price, desc, icon: 'fas fa-capsules', images, ingredients, quantities };
+
+  const idx = parseInt(document.getElementById('editIndex').value);
+  if (idx === -1) {
+    products.push(product);
+    showToast(`"${name}" added successfully!`, 'success');
+  } else {
+    products[idx] = product;
+    showToast(`"${name}" updated successfully!`, 'success');
+  }
+  save();
+  closeModal();
+}
+
+/* ─── DYNAMIC ROWS ─── */
+function addImageRow(val = '') {
+  const c = document.getElementById('imagesInput');
+  const d = document.createElement('div');
+  d.className = 'image-entry';
+  const uid = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  d.innerHTML = `
+    <img class="img-thumb${val ? ' visible' : ''}" src="${val || ''}" alt="preview">
+    <span class="img-path-text" title="${escHtml(val)}">${val ? val.substring(0,40) + (val.length>40?'…':'') : 'No image selected'}</span>
+    <label class="img-upload-label">
+      <i class="fas fa-upload"></i> Upload PNG
+      <input type="file" accept="image/*" onchange="handleImageUpload(this)">
+    </label>
+    <button class="del-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+  // store current value as data attribute so saveProduct can read it
+  d.dataset.imgSrc = val;
+  c.appendChild(d);
+}
+
+function handleImageUpload(input) {
+  const entry = input.closest('.image-entry');
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    entry.dataset.imgSrc = src;
+    const thumb = entry.querySelector('.img-thumb');
+    const label = entry.querySelector('.img-path-text');
+    thumb.src = src;
+    thumb.classList.add('visible');
+    label.textContent = file.name;
+    label.title = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function addQtyRow(label = '', price = '', imgs = '') {
+  const c = document.getElementById('qtyList');
+  const d = document.createElement('div');
+  d.className = 'qty-row';
+  d.innerHTML = `
+    <input type="text" placeholder="Label (e.g. 110ML)" value="${escHtml(label)}">
+    <input type="text" placeholder="Price (e.g. ₹70)" value="${escHtml(price)}">
+    <input type="text" placeholder="Alt images (comma-separated paths, optional)" value="${escHtml(imgs)}">
+    <button class="del-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+  c.appendChild(d);
+}
+
+function addIngredientRow(name = '', img = '', desc = '') {
+  const c = document.getElementById('ingredientList');
+  const d = document.createElement('div');
+  d.className = 'ingredient-row';
+  d.dataset.imgSrc = img;
+  d.innerHTML = `
+    <input type="text" placeholder="Ingredient name" value="${escHtml(name)}">
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+      ${img ? `<img style="width:40px;height:40px;border-radius:6px;object-fit:cover;border:1.5px solid var(--border);" src="${escHtml(img)}" alt="ing">` : ''}
+      <label class="img-upload-label" style="font-size:0.75rem;padding:5px 10px;">
+        <i class="fas fa-upload"></i> Upload
+        <input type="file" accept="image/*" onchange="handleIngredientImageUpload(this)">
+      </label>
+    </div>
+    <textarea class="desc-col" placeholder="Description…" rows="2">${escHtml(desc)}</textarea>
+    <button class="del-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+  c.appendChild(d);
+}
+
+function handleIngredientImageUpload(input) {
+  const row = input.closest('.ingredient-row');
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    row.dataset.imgSrc = src;
+    const wrapper = input.closest('div');
+    let prevImg = wrapper.querySelector('img');
+    if (!prevImg) {
+      prevImg = document.createElement('img');
+      prevImg.style = 'width:40px;height:40px;border-radius:6px;object-fit:cover;border:1.5px solid var(--border);';
+      prevImg.alt = 'ing';
+      wrapper.insertBefore(prevImg, wrapper.firstChild);
+    }
+    prevImg.src = src;
+  };
+  reader.readAsDataURL(file);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── DELETE ─── */
+let _deleteIdx = -1;
+function confirmDelete(idx, name) {
+  _deleteIdx = idx;
+  document.getElementById('confirmMsg').textContent = `Delete "${name}"? This cannot be undone.`;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.getElementById('confirmOkBtn').onclick = () => {
+    products.splice(_deleteIdx, 1);
+    save();
+    showToast('Product deleted.', 'success');
+    closeConfirm();
+  };
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+
+/* ─── PAGES ─── */
+function showPage(page) {
+  document.getElementById('pageProducts').style.display = page === 'products' ? 'block' : 'none';
+  document.getElementById('pageExport').style.display = page === 'export' ? 'block' : 'none';
+  document.getElementById('pageDeploy').style.display = page === 'deploy' ? 'block' : 'none';
+  document.getElementById('addProductBtn').style.display = page === 'products' ? 'inline-flex' : 'none';
+  const titles = { products: 'Products', export: 'Export & Deploy', deploy: 'Push to GitHub' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  document.getElementById('scriptPreview').style.display = 'none';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if (page === 'deploy') loadTokenField();
+}
+
+/* ─── GITHUB DEPLOY ─── */
+const GITHUB_OWNER = 'gaurav-agarwal-github';
+const GITHUB_REPO  = 'Quality-Pharmaceuticals';
+const GITHUB_FILE  = 'script.js';
+const GITHUB_BRANCH = 'main';
+
+function saveToken() {
+  const t = document.getElementById('ghToken').value.trim();
+  if (!t) { showToast('Please enter a token first.', 'error'); return; }
+  localStorage.setItem('gh_token', t);
+  showToast('Token saved securely in browser!', 'success');
+  updateTokenBadge(true);
+}
+
+function loadTokenField() {
+  const saved = localStorage.getItem('gh_token');
+  if (saved) {
+    document.getElementById('ghToken').value = saved;
+    updateTokenBadge(true);
+  } else {
+    updateTokenBadge(false);
+  }
+}
+
+function updateTokenBadge(has) {
+  const badge = document.getElementById('tokenBadge');
+  badge.innerHTML = has
+    ? '<span class="token-saved-badge"><i class="fas fa-check"></i> Saved</span>'
+    : '';
+}
+
+function toggleTokenVisibility() {
+  const inp = document.getElementById('ghToken');
+  const icon = document.getElementById('tokenEyeIcon');
+  if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+  else { inp.type = 'password'; icon.className = 'fas fa-eye'; }
+}
+
+function setDeployStatus(type, html) {
+  const el = document.getElementById('deployStatus');
+  el.className = 'deploy-status ' + type;
+  el.innerHTML = html;
+}
+
+async function deployToGitHub() {
+  const token = localStorage.getItem('gh_token') || document.getElementById('ghToken').value.trim();
+  if (!token) {
+    setDeployStatus('error', '<i class="fas fa-exclamation-circle"></i> No token found. Please save your GitHub token first.');
+    return;
+  }
+
+  const btn = document.getElementById('deployBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-circle-notch spin"></i> Pushing to GitHub...';
+  setDeployStatus('info', '<i class="fas fa-circle-notch spin"></i> Connecting to GitHub...');
+
+  try {
+    setDeployStatus('info', '<i class="fas fa-circle-notch spin"></i> Fetching current file from GitHub...');
+    // Cache-bust to always get the latest SHA from GitHub
+    const cacheBust = `&t=${Date.now()}`;
+    const getRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}${cacheBust}`,
+      { 
+        method: 'GET',
+        mode: 'cors',
+        headers: { 
+          Authorization: `token ${token}`, 
+          Accept: 'application/vnd.github.v3+json',
+          'X-Requested-With': 'XMLHttpRequest'
+        } 
+      }
+    );
+    if (!getRes.ok) {
+      const err = await getRes.json();
+      throw new Error(err.message || `GitHub API error: ${getRes.status}`);
+    }
+    const fileData = await getRes.json();
+    const sha = fileData.sha;
+
+    setDeployStatus('info', '<i class="fas fa-circle-notch spin"></i> Generating updated script.js...');
+    const newContent = generateScript();
+    const encoded = btoa(unescape(encodeURIComponent(newContent)));
+
+    // Small delay to ensure GitHub has the latest SHA ready
+    await new Promise(r => setTimeout(r, 800));
+
+    setDeployStatus('info', '<i class="fas fa-circle-notch spin"></i> Committing to GitHub...');
+    const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const putRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Admin Panel update – ${now} IST`,
+          content: encoded,
+          sha: sha,
+          branch: GITHUB_BRANCH
+        })
+      }
+    );
+    if (!putRes.ok && putRes.status !== 0) {
+      const err = await putRes.json();
+      const detail = err.message || '';
+      if (putRes.status === 409 || detail.includes('does not match')) {
+        // SHA conflict - fetch fresh SHA and retry once
+        setDeployStatus('info', '<i class="fas fa-circle-notch spin"></i> SHA conflict detected, retrying with fresh data...');
+        await new Promise(r => setTimeout(r, 1000));
+        const retryRes = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}&t=${Date.now()}`,
+          { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Cache-Control': 'no-cache' } }
+        );
+        const retryData = await retryRes.json();
+        const freshSha = retryData.sha;
+        const retryPut = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
+          {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `Admin Panel update – ${now} IST (retry)`, content: encoded, sha: freshSha, branch: GITHUB_BRANCH })
+          }
+        );
+        if (!retryPut.ok) {
+          const retryErr = await retryPut.json();
+          throw new Error(`Retry failed: ${retryErr.message || retryPut.status}`);
+        }
+        const retryResult = await retryPut.json();
+        const retryCommitUrl = retryResult.commit?.html_url || `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/commits/main`;
+        setDeployStatus('success',
+          `<i class="fas fa-check-circle"></i>
+          <div>
+            <strong>Successfully pushed to GitHub!</strong><br>
+            <span style="font-size:0.82rem;opacity:0.85;">Vercel is now deploying. Your live site will update in ~30 seconds.</span><br>
+            <a href="${retryCommitUrl}" target="_blank" style="font-size:0.82rem;color:var(--teal);margin-top:4px;display:inline-block;">View commit on GitHub →</a>
+            &nbsp;&nbsp;
+            <a href="https://quality-pharmaceuticals-mocha.vercel.app" target="_blank" style="font-size:0.82rem;color:var(--teal);">View live site →</a>
+          </div>`
+        );
+        showToast('Deployed! Vercel is updating your site.', 'success');
+        return;
+      }
+      throw new Error(`Commit failed (${putRes.status}): ${detail}`);
+    }
+    const result = await putRes.json();
+    const commitUrl = result.commit?.html_url || `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/commits/main`;
+
+    setDeployStatus('success',
+      `<i class="fas fa-check-circle"></i>
+      <div>
+        <strong>Successfully pushed to GitHub!</strong><br>
+        <span style="font-size:0.82rem;opacity:0.85;">Vercel is now deploying. Your live site will update in ~30 seconds.</span><br>
+        <a href="${commitUrl}" target="_blank" style="font-size:0.82rem;color:var(--teal);margin-top:4px;display:inline-block;">View commit on GitHub →</a>
+        &nbsp;&nbsp;
+        <a href="https://quality-pharmaceuticals-mocha.vercel.app" target="_blank" style="font-size:0.82rem;color:var(--teal);">View live site →</a>
+      </div>`
+    );
+    showToast('Deployed! Vercel is updating your site.', 'success');
+
+  } catch (err) {
+    let errMsg = err.message;
+    let hint = '';
+    if (errMsg === 'Failed to fetch' || errMsg.includes('NetworkError') || errMsg.includes('fetch')) {
+      hint = '<br><span style="font-size:0.8rem;opacity:0.85;">💡 This is usually caused by: <strong>1)</strong> Invalid or expired GitHub token — please generate a new one and re-save it. <strong>2)</strong> No internet connection. <strong>3)</strong> Token missing the <code>repo</code> scope.</span>';
+    } else if (errMsg.includes('401') || errMsg.includes('Bad credentials')) {
+      hint = '<br><span style="font-size:0.8rem;opacity:0.85;">💡 <strong>Token is invalid or expired.</strong> Go to github.com/settings/tokens, generate a new classic token with <code>repo</code> scope, and save it in the Push to GitHub settings.</span>';
+    } else if (errMsg.includes('404')) {
+      hint = '<br><span style="font-size:0.8rem;opacity:0.85;">💡 <strong>Repo or file not found.</strong> Make sure the repo name and script.js path are correct.</span>';
+    }
+    setDeployStatus('error', `<i class="fas fa-exclamation-circle"></i> <div><strong>Deploy failed</strong><br><span style="font-size:0.82rem;">${errMsg}</span>${hint}</div>`);
+    showToast('Deploy failed. Check the error message.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fab fa-github"></i> Push script.js to GitHub → Deploy Live';
+  }
+}
+
+
+/* ─── EXPORT ─── */
+function generateScript() {
+  // We regenerate the FULL script.js replacing only the products array
+  const scriptPreamble = `/* ============================================================
+   script.js – Quality Pharmaceuticals
+   ============================================================ */
+
+// ── Loading Screen ──────────────────────────────────────────
+window.addEventListener('load', () => {
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.add('hidden');
+});
+
+// ── Navbar: scroll effect + mobile toggle ───────────────────
+const navbar = document.getElementById('navbar');
+
+window.addEventListener('scroll', () => {
+    if (!navbar) return;
+    navbar.classList.toggle('scrolled', window.scrollY > 100);
+});
+
+const mobileMenu = document.querySelector('.mobile-menu');
+const navLinks   = document.querySelector('.nav-links');
+if (mobileMenu && navLinks) {
+    mobileMenu.addEventListener('click', () => navLinks.classList.toggle('open'));
+}
+
+// ── Smooth Scrolling ─────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (navLinks) navLinks.classList.remove('open');
+        }
+    });
+});
+
+// ── AOS Initialization ───────────────────────────────────────
+if (typeof AOS !== 'undefined') {
+    AOS.init({ duration: 800, once: true, offset: 100 });
+}
+
+// ── Stats Counter Animation ──────────────────────────────────
+function animateCounters() {
+    document.querySelectorAll('[data-target]').forEach(counter => {
+        const target    = parseInt(counter.getAttribute('data-target'));
+        const increment = target / 100;
+        let current     = 0;
+        const suffix    = target > 100 ? '+' : '';
+
+        const update = () => {
+            if (current < target) {
+                current += increment;
+                counter.textContent = Math.floor(current) + suffix;
+                requestAnimationFrame(update);
+            } else {
+                counter.textContent = target + suffix;
+            }
+        };
+        update();
+    });
+}
+
+// ── Fade-in + Stats Observer ─────────────────────────────────
+const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            if (entry.target.querySelector('[data-target]')) animateCounters();
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+
+// ── Product Cards: staggered appearance ──────────────────────
+const productObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        }
+    });
+});
+document.querySelectorAll('.product-card').forEach(card => productObserver.observe(card));
+
+// ── Parallax on floating icons ───────────────────────────────
+window.addEventListener('scroll', () => {
+    const icons = document.querySelector('.floating-icons');
+    if (icons) icons.style.transform = \`translateY(\${window.pageYOffset * 0.5}px)\`;
+});
+
+// ── Testimonial auto-slider ───────────────────────────────────
+(function () {
+    const slider = document.getElementById('testimonialSlider');
+    if (!slider) return;
+    const slides = slider.querySelectorAll('.testimonial');
+    if (!slides.length) return;
+    let idx = 0;
+    setInterval(() => {
+        idx = (idx + 1) % slides.length;
+        slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
+    }, 5000);
+})();
+
+// ── Contact Form ──────────────────────────────────────────────
+const contactForm = document.querySelector('.contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', e => {
+        e.preventDefault();
+        alert('Thank you for your message! We will get back to you soon.');
+        e.target.reset();
+    });
+}
+
+// ── Products Data ─────────────────────────────────────────────
+const products = ${JSON.stringify(products, null, 4)};
+
+// ── Modal Logic ───────────────────────────────────────────────
+const productModal = document.getElementById('productModal');
+if (productModal) {
+    const modalClose   = document.getElementById('modalClose');
+    const mainImage    = document.getElementById('mainImage');
+    const galleryImgEls = [
+        document.getElementById('galleryImage1'),
+        document.getElementById('galleryImage2'),
+        document.getElementById('galleryImage3')
+    ];
+
+    function setGalleryImages(images, productName) {
+        galleryImgEls.forEach((el, i) => {
+            el.innerHTML = '<i class="fas fa-image" style="font-size:1.5rem;color:var(--gray);"></i>';
+            el.onclick = null;
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+        galleryImgEls.forEach((el, i) => {
+            if (images[i + 1]) {
+                el.style.display = 'flex';
+                el.innerHTML = \`<img src="\${images[i+1]}" alt="\${productName} \${i+2}">\`;
+                el.onclick = () => {
+                    const prev = mainImage.querySelector('img').src;
+                    mainImage.innerHTML = \`<img src="\${images[i+1]}" alt="\${productName}">\`;
+                    el.innerHTML = \`<img src="\${prev}" alt="\${productName} \${i+2}">\`;
+                    galleryImgEls.forEach(g => g.classList.remove('active'));
+                    el.classList.add('active');
+                };
+            }
+        });
+    }
+
+    function openProductModal(product) {
+        document.getElementById('modalProductName').textContent = product.name;
+        document.getElementById('modalProductDesc').textContent = product.desc;
+
+        const quantitySection  = document.getElementById('modalQuantitySection');
+        const quantityOptions  = document.getElementById('quantityOptions');
+        const priceElement     = document.getElementById('modalProductPrice');
+
+        const defaultImages = product.images && product.images.length ? product.images : [''];
+
+        if (product.quantities && product.quantities.length) {
+            quantitySection.style.display = 'block';
+            quantityOptions.innerHTML = '';
+            product.quantities.forEach((qty, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'quantity-option' + (idx === 0 ? ' active' : '');
+                btn.innerHTML = \`<span class="qty-label">\${qty.label}</span>\`;
+                btn.onclick = () => {
+                    priceElement.textContent = qty.price;
+                    document.querySelectorAll('.quantity-option').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const imgs = qty.images && qty.images.length ? qty.images : defaultImages;
+                    mainImage.innerHTML = imgs[0] ? \`<img src="\${imgs[0]}" alt="\${product.name}">\` : '<i class="fas fa-image" style="font-size:4rem;color:var(--gray);"></i>';
+                    setGalleryImages(imgs, product.name);
+                };
+                quantityOptions.appendChild(btn);
+            });
+            priceElement.textContent = product.quantities[0].price;
+        } else {
+            quantitySection.style.display = 'none';
+            priceElement.textContent = product.price;
+        }
+
+        mainImage.innerHTML = defaultImages[0]
+            ? \`<img src="\${defaultImages[0]}" alt="\${product.name}">\`
+            : '<i class="fas fa-image" style="font-size:4rem;color:var(--gray);"></i>';
+        setGalleryImages(defaultImages, product.name);
+
+        const grid = document.getElementById('ingredientsGridFull');
+        grid.innerHTML = '';
+        if (product.ingredients && product.ingredients.length) {
+            const container = document.createElement('div');
+            container.className = 'ingredients-table';
+            product.ingredients.forEach(ing => {
+                const item = document.createElement('div');
+                item.className = 'ingredient-item';
+                const imgHtml = ing.img
+                    ? \`<img src="\${ing.img}" alt="\${ing.name}">\`
+                    : \`<div class="ingredient-icon"><i class="\${ing.icon || 'fas fa-leaf'}"></i></div>\`;
+                item.innerHTML = \`\${imgHtml}<div><p><strong>\${ing.name}</strong></p><p class="ingredient-desc">\${ing.desc || ''}</p></div>\`;
+                container.appendChild(item);
+            });
+            grid.appendChild(container);
+        }
+
+        productModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProductModal() {
+        productModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    if (modalClose) modalClose.addEventListener('click', closeProductModal);
+    productModal.addEventListener('click', e => { if (e.target === productModal) closeProductModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProductModal(); });
+
+    const grid = document.getElementById('productsGrid');
+    if (grid) {
+        products.forEach((product, i) => {
+            const card = document.createElement('div');
+            card.className = 'product-card fade-in';
+            const imgSrc = product.images && product.images.length ? product.images[0] : '';
+            card.innerHTML = \`
+                <div class="product-image" style="background:linear-gradient(135deg,var(--light-gray),var(--white));">
+                    \${imgSrc ? \`<img src="\${imgSrc}" alt="\${product.name}" style="width:100%;height:100%;object-fit:contain;padding:1rem;">\` : \`<i class="\${product.icon}" style="font-size:3rem;color:var(--primary-teal);"></i>\`}
+                </div>
+                <div class="product-info">
+                    <div class="product-price">\${product.price}</div>
+                    <h4>\${product.name}</h4>
+                    <p>\${product.desc.substring(0,60)}...</p>
+                </div>
+            \`;
+            card.addEventListener('click', () => openProductModal(product));
+            grid.appendChild(card);
+            productObserver.observe(card);
+        });
+    }
+}
+`;
+  return scriptPreamble;
+}
+
+function downloadScript() {
+  const content = generateScript();
+  const blob = new Blob([content], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'script.js';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('script.js downloaded! Upload it to your server.', 'success');
+}
+
+function previewScript() {
+  const el = document.getElementById('scriptPreview');
+  if (el.style.display === 'none') {
+    el.textContent = generateScript().substring(0, 3000) + '\n\n... (truncated for preview)';
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+/* ─── TOAST ─── */
+function showToast(msg, type = '') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+  t.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+/* ─── KEYBOARD ─── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeConfirm();
+  }
+});
+</script>
+</body>
+</html>
